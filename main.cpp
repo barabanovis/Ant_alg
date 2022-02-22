@@ -93,7 +93,7 @@ vector<point> cities(count_of_cities);
 
 // todo принимаем каждый город по очереди
 for(int cur_city=1;cur_city<=count_of_cities;cur_city++){
-    cout << "������� ���������� ������ " << cur_city << ": ";
+    cout << "Enter coordinates city number " << cur_city << ": ";
     cin >> cities[cur_city].x_coordinate >> cities[cur_city].y_coordinate;
 
 }
