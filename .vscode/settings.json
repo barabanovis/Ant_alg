@@ -1,6 +1,7 @@
 {
     "cSpell.words": [
-        "библиотек"
+        "библиотек",
+        "вектор"
     ],
     "files.associations": {
         "iostream": "cpp"
