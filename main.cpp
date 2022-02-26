@@ -2,10 +2,11 @@
 
 
 
-// подключение начальных библиотек
+//@ подключение начальных библиотек
 #include <iostream>
 #include <cmath>
 #include <vector>
+#include <set>
 using namespace std;
 
 typedef long long ll; // ? Зачем нужна эта строчка?
@@ -39,35 +40,51 @@ const int MAX_CITY_COUNT=100;
  struct Ant{
   // вектор, который будет хранить номера посещённых городов
  vector<long long> list_of_visited_cities;
-
+ set<long long> set_of_visited_cities;
  long long route_length; // длина пути, который уже пройден муравьём
+
+long long last_visited_city;
 
 
  // todo задание стартового города муравью
  void set_start_city(long long start_city){
- list_of_visited_cities.clear(); // Очистка списка посещённых городов
-
-// добавление города в список
+ clear();
+ last_visited_city=start_city;
+ // добавление города в список
  list_of_visited_cities.push_back(start_city);
+ set_of_visited_cities.insert(start_city);
  }
 
 
  // todo перемещение муравья в определённый город
- void Go_to_city(long long city_number){ // ��� � ����� ����� city_number
-     // * Обновление пройденного пути
+ void Go_to_city(long long city_number){ 
+     // @ Обновление пройденного пути
      route_length+=Distance[list_of_visited_cities.back()][city_number];
-     // * Добавление города в список пройденных городов
-     list_of_visited_cities.push_back(city_number); // ���������� ������ � �������
-
+     // @ Добавление города в список пройденных городов
+     list_of_visited_cities.push_back(city_number); 
+     last_visited_city=city_number;
+     set_of_visited_cities.insert(city_number);
 
  };
 
 
  // todo Очистка полей муравья
  void clear(){
+    last_visited_city=0; 
     route_length=0;
     list_of_visited_cities.clear();
+    set_of_visited_cities.clear();
  };
+ 
+//todo метод, проверяющий, был ли муравей в определённом городе
+ bool was_in_city(long long city_number){
+     if(set_of_visited_cities.count(city_number)==0) return false;
+     return true;
+ }
+
+
+
+
 
  };
 
@@ -85,8 +102,8 @@ return sqrt(d1_square+d2_square);
 
 
  int main(){
-
- setlocale(LC_ALL,"RUS"); // ! чтобы можно было выводить в консоль русские символы
+// ! чтобы можно было выводить в консоль русские символы
+ setlocale(LC_ALL,"RUS"); 
 
 
 ll count_of_cities;
@@ -144,7 +161,7 @@ const long long Q=1;
 //! Особенно важная переменная
 //? За что она отвечает?
 //* За изначальную концентрацию феромона на поле/графе
-const long double start_feromom_concentration=0.5;
+const long double start_pheromon_concentration=0.5;
 
 //* Учтя, что количество городов по всем входным данным не 
 //* превосходит 100, можем сразу установить предесы матрицы
@@ -152,11 +169,10 @@ long double pheromone[MAX_CITY_COUNT+1][MAX_CITY_COUNT+1];
 
 for(ll i=1;i<count_of_cities+1;i++){
     for(ll j=1;j<=i;j++){
-        pheromone[i][j]=0.5;
-        pheromone[j][i]=0.5;
+        pheromone[i][j]=start_pheromon_concentration;
+        pheromone[j][i]=start_pheromon_concentration;
     }
 }
-
 // Создание отдельных контейнеров для хранения наилучшего найденного
 // пути
 //? Зачем?
@@ -181,16 +197,33 @@ cin >> colony_time_limit; // Принятие этой самой перемен
 
 
 
-//! Теперь перейдём к основной части алгоритма
 
-
-
+long long count_of_ants=count_of_cities;
+// todo Цикл по времени жизни колонии ==== 0
 for(ll current_time=1;current_time<=colony_time_limit;current_time++){
-    // ���� �� ���� ��������
-    for(ll cur_ant_number=1;cur_ant_number<=count_of_cities;cur_ant_number++){
+    //todo Цикл по всем муравьям ==== 1
+    for(ll cur_ant_number=1;cur_ant_number<=count_of_ants;cur_ant_number++){
+      // todo Построить маршрут по описанному правилу ==== 2
+      //? Как это сделать?
+      //* Будем использовать уже известную формулу, основанную на вероятностном выборе
+     
+      //$ Для начала подсчитаем вероятность перехода в каждый город
+      //? То есть?
+      //* Подсчитаем значение числителей из поставленной формулы и запишем их в массив(вектор)
+      vector<long double> probabilities(count_of_cities+1,0);
+      // $ Параллельно подсчитаем сумму всех числителей
+      //? Как?
+      //* Просто создадим соответствующую переменную, куда каждый раз будем прибавлять полученное число.
+      long double sum_of_probabilities=0;
+      for(long long cur_city=1,cur_city<=count_of_cities;cur_city++){
+         probabilities[cur_city]=pow(pheromon[Roy[cur_ant_number].])
 
+      } 
 
+      
+      
 
+    
     }
 
 
