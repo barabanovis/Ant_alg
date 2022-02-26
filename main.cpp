@@ -8,12 +8,13 @@
 #include <vector>
 using namespace std;
 
-typedef long long ll; // ? Зачем нужна эта строчка
+typedef long long ll; // ? Зачем нужна эта строчка?
 // * По сути, эта строчка не нужна, мне просто удобнее писать ll
 // * в замен long long
 
 
-//! Создание важной констатны, хранящей в себе
+//! Создание важной констатны, хранящей в себе максимально-возможное
+//! количество городов
 const int MAX_CITY_COUNT=100;
 
 
@@ -23,7 +24,7 @@ const int MAX_CITY_COUNT=100;
 // * Заметим, что расстояние размеры матрицы указаты как 101 на 101
 // * потому, что количество городов, которые будет принимать программа
 // * не превышает 100 для лучшей показательности
- long double Distance[101][101]; // +1 ��� 1-���������
+ long double Distance[MAX_CITY_COUNT+1][MAX_CITY_COUNT+1]; // +1 ��� 1-���������
 
  // * Структура "точка" задаваемая как точка на плоскости Oxy
  struct point{
@@ -89,7 +90,7 @@ return sqrt(d1_square+d2_square);
 
 
 ll count_of_cities;
-cout << "������ ���������� �������: ";
+cout << "Enter number of cities: ";
 cin >> count_of_cities; // получаем число городов
 cout << '\n'; // переходим на новую строку 
 vector<point> cities(count_of_cities);
@@ -147,35 +148,43 @@ const long double start_feromom_concentration=0.5;
 
 //* Учтя, что количество городов по всем входным данным не 
 //* превосходит 100, можем сразу установить предесы матрицы
-long double feromon[101][101];
+long double pheromone[MAX_CITY_COUNT+1][MAX_CITY_COUNT+1];
 
 for(ll i=1;i<count_of_cities+1;i++){
     for(ll j=1;j<=i;j++){
-        feromon[i][j]=0.5;
-        feromon[j][i]=0.5;
+        pheromone[i][j]=0.5;
+        pheromone[j][i]=0.5;
     }
 }
 
-// ����� ���������� ����������� ��������
-// ����� ��� ����� ������� �� ���� ������� �� ������� �� �������
-
+// Создание отдельных контейнеров для хранения наилучшего найденного
+// пути
+//? Зачем?
+//* Так удобнее сохранять результаты.
 vector<int> best_way(0);
 long double best_length=0;
 
+//todo Задание стартового маршрута, для сравнения
+//? Каким он является?
+//* Маршрут через все города по очереди в порядке возрастания
 for(int i=1;i<=count_of_cities;i++){
     best_way.push_back(i);
     best_length+=Distance[i][best_way.back()];
 }
 
 
-//���� �� ������� ����� �������
-cout << '\n';
-cout << "������� ����� ����� �������: ";
-ll colony_time_limit;
-cin >> colony_time_limit;
+//todo Получение времени жизни колонии
+cout << '\n'; // Новая строчка
+cout << "Enter colony lifetime (iterations): ";
+ll colony_time_limit; // Сама переменная для хранения этого предела
+cin >> colony_time_limit; // Принятие этой самой переменной
 
 
-// �� ����
+
+//! Теперь перейдём к основной части алгоритма
+
+
+
 for(ll current_time=1;current_time<=colony_time_limit;current_time++){
     // ���� �� ���� ��������
     for(ll cur_ant_number=1;cur_ant_number<=count_of_cities;cur_ant_number++){
