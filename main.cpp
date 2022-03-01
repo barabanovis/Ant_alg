@@ -25,10 +25,10 @@ const int MAX_CITY_COUNT=100;
 
 // Просто матрица расстояний между городами
 // ? Почему размеры матрицы указаны как 101 на 101?
-// * Заметим, что расстояние размеры матрицы указаты как 101 на 101
+// * Заметим, что расстояние размеры матрицы указаты как MAX_CITY_COUNT+1 на MAX_CITY_COUNT+1
 // * потому, что количество городов, которые будет принимать программа
-// $ не превышает 100 для лучшей показательности
- long double Distance[MAX_CITY_COUNT+1][MAX_CITY_COUNT+1]; // +1 ��� 1-���������
+// $ не превышает MAX_CITY_COUNT для лучшей показательности
+ long double Distance[MAX_CITY_COUNT+1][MAX_CITY_COUNT+1]; 
 
  // @ Структура "точка" задаваемая как точка на плоскости Oxy
  struct point{
@@ -118,7 +118,7 @@ return sqrt(d1_square+d2_square);
 
 
 int count_of_cities;
-cout << "Enter number of cities: ";
+cout << "Введите количество городов: ";
 cin >> count_of_cities; // получаем число городов
 cout << '\n'; // переходим на новую строку 
 vector<point> cities(count_of_cities);
@@ -128,36 +128,10 @@ vector<point> cities(count_of_cities);
 
 // todo принимаем каждый город по очереди
 for(int cur_city=1;cur_city<=count_of_cities;cur_city++){
-    cout << "Enter coordinates city number " << cur_city << ": ";
+    cout << "Введите координаты города под номером " << cur_city << ": ";
     cin >> cities[cur_city].x_coordinate >> cities[cur_city].y_coordinate;
 
 }
-
-// todo заполняем матрицу расстояний
-//? Почему именно так?
-// * Учитывая, что Distance[i][j]=Distance[j][i] можно значительно ускорить вычисления
-for(int i=1;i<=count_of_cities+1;i++){
-    for(int j=1;j<i;j++){
-            
-            ll temp=distance_between_points(cities[i],cities[j]);
-            Distance[i][j]=temp;
-            Distance[j][i]=temp;
-
-    
-    }
-}
-
-
-//w Заполнение матрицы обратных расстояний
-vector<long double> back_Distance(count_of_cities+1);
-for(int i=1;i<=count_of_cities+1;i++){
-    for(int j=1;j<i;j++){
-            back_Distance[i][j]=1/Distance[i][j];
-            back_Distance[j][i]=1/Distance[i][j];
-    }
-}
-
-
 
 // todo инициализация матрицы расстояний
 // ? Каким образом? 
@@ -166,9 +140,37 @@ for(long long i=1;i<=count_of_cities;i++){
     for(long long j =1;j<=count_of_cities;j++) Distance[i][j]=0;
 }
 
+// todo заполняем матрицу расстояний
+//? Почему именно так?
+// * Учитывая, что Distance[i][j]=Distance[j][i] можно значительно ускорить вычисления
+for(int i=1;i<=count_of_cities;i++){
+    for(int j=1;j<i;j++){
+            
+        ll temp=distance_between_points(cities[i],cities[j]);
+        Distance[i][j]=temp;
+        Distance[j][i]=temp;
+
+    
+    }
+}
+
+
+//w Заполнение матрицы обратных расстояний
+vector<vector<long double>> matrix_of_seen(count_of_cities+1,vector<long double> (count_of_cities+1,0));
+for(int i=2;i<=count_of_cities;i++){
+    for(int j=1;j<i;j++){
+        matrix_of_seen[i][j]=1/Distance[i][j];
+        matrix_of_seen[j][i]=1/Distance[i][j];
+    }
+}
+
+
+
+
+
 
 //w Создание вектора, олицетворяющего рой муравьёв
-vector<Ant> Roy(count_of_cities);
+vector<Ant> Roy(count_of_cities+1);
 
 //todo Установка начальных положений муравьёв
 for(ll i=1;i<=count_of_cities;i++){
@@ -192,8 +194,8 @@ const long double start_pheromone_concentration=0.5;
 //* превосходит 100, можем сразу установить пределы матрицы
 long double pheromone[MAX_CITY_COUNT+1][MAX_CITY_COUNT+1];
 
-for(ll i=1;i<count_of_cities+1;i++){
-    for(ll j=1;j<=i;j++){
+for(ll i=1;i<=count_of_cities;i++){
+    for(ll j=1;j<i;j++){
         pheromone[i][j]=start_pheromone_concentration;
         pheromone[j][i]=start_pheromone_concentration;
     }
