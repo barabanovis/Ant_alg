@@ -7,8 +7,24 @@
 #include <cmath>
 #include <vector>
 #include <set>
+#include <ctime>
 
 using namespace std;
+
+
+//w Герератор псевдослучайных чисел
+//? Как он работает?
+//* Он использует время в секундах с момента запуска компьютера как зерно (seed), затем производит 
+//* псевдослучайное число в пределах от заданного l до r невключительно
+int getrandom(int l,int r){
+unsigned value=unsigned(time(nullptr)); // Зерно
+for(int i=0;i<13;i++){
+    value=(value*2+343)%(r-l);
+}
+return value+l;
+}
+
+
 
 //w Удобное объявление
 //? Зачем?
@@ -24,7 +40,7 @@ const int MAX_CITY_COUNT=100;
 
 
 // Просто матрица расстояний между городами
-// ? Почему размеры матрицы указаны как 101 на 101?
+// ? Почему размеры матрицы указаны как MAX_CITY_COUNT+1 на MAX_CITY_COUNT+1?
 // * Заметим, что расстояние размеры матрицы указаты как MAX_CITY_COUNT+1 на MAX_CITY_COUNT+1
 // * потому, что количество городов, которые будет принимать программа
 // $ не превышает MAX_CITY_COUNT для лучшей показательности
@@ -113,12 +129,54 @@ return sqrt(d1_square+d2_square);
 // ~ ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
  int main(){
-//ч чтобы можно было выводить в консоль русские символы
- setlocale(LC_ALL,"RUS"); 
+
+cout << "Do you want to see developer details? (Y/N)" << '\n';
+bool dev_det;
+char ask;
+cin >> ask;
+if(ask=='Y' || ask=='y'){
+    dev_det=true;
+}else{
+    dev_det=false;
+}
+
+
+
+//todo Инициализируем необходимые константы
+cout << "Enter constants " << '\n';
+
+cout << "ALPHA = ";
+int ALPHA;
+cin >> ALPHA;
+cout << '\n';
+
+int BETTA;
+cout << "BETTA = ";
+cin >> BETTA;
+cout << '\n';
+
+int e;
+cout << "e = ";
+cin >> e;
+cout << '\n';
+
+int Q=1;
+cout << "Q = ";
+cin >> Q;
+cout << '\n';
+
+//! Особенно важная переменная
+//? За что она отвечает?
+//* За изначальную концентрацию феромона на поле/графе
+long double start_pheromone_concentration;
+cout << "start_pheromone_concentration = ";
+cin >> start_pheromone_concentration;
+cout << '\n';
+
 
 
 int count_of_cities;
-cout << "Введите количество городов: ";
+cout << "Enter count of cities: ";
 cin >> count_of_cities; // получаем число городов
 cout << '\n'; // переходим на новую строку 
 vector<point> cities(count_of_cities);
@@ -128,10 +186,17 @@ vector<point> cities(count_of_cities);
 
 // todo принимаем каждый город по очереди
 for(int cur_city=1;cur_city<=count_of_cities;cur_city++){
-    cout << "Введите координаты города под номером " << cur_city << ": ";
+    cout << "Enter coordinates of city number " << cur_city << ": ";
     cin >> cities[cur_city].x_coordinate >> cities[cur_city].y_coordinate;
 
 }
+
+
+
+if(dev_det){
+    cout << "Initializing Distance ";
+}
+
 
 // todo инициализация матрицы расстояний
 // ? Каким образом? 
@@ -140,6 +205,11 @@ for(long long i=1;i<=count_of_cities;i++){
     for(long long j =1;j<=count_of_cities;j++) Distance[i][j]=0;
 }
 
+
+if(dev_det){
+    cout << "COMPLETED" << '\n';
+    cout << "Calculating Distance " ;
+}
 // todo заполняем матрицу расстояний
 //? Почему именно так?
 // * Учитывая, что Distance[i][j]=Distance[j][i] можно значительно ускорить вычисления
@@ -155,6 +225,14 @@ for(int i=1;i<=count_of_cities;i++){
 }
 
 
+
+
+
+
+if(dev_det){
+    cout << "COMPLETED" << '\n';
+    cout << "Initializing matrix_of_seen ";
+}
 //w Заполнение матрицы обратных расстояний
 vector<vector<long double>> matrix_of_seen(count_of_cities+1,vector<long double> (count_of_cities+1,0));
 for(int i=2;i<=count_of_cities;i++){
@@ -163,7 +241,10 @@ for(int i=2;i<=count_of_cities;i++){
         matrix_of_seen[j][i]=1/Distance[i][j];
     }
 }
-
+if(dev_det){
+ cout << "COMPLETED" << '\n';
+ cout << "Initializing the Roy ";
+}
 
 
 
@@ -178,17 +259,14 @@ for(ll i=1;i<=count_of_cities;i++){
     // город
 }
 
+if (dev_det){
+    cout << "COMPLETED" << '\n';
+    cout << "Initialization preromone ";
+}
 
-//todo Инициализируем необходимые константы
-const long long ALPHA=1;
-const long long BETA=1;
-const long long e=1;
-const long long Q=1;
 
-//! Особенно важная переменная
-//? За что она отвечает?
-//* За изначальную концентрацию феромона на поле/графе
-const long double start_pheromone_concentration=0.5;
+
+
 
 //* Учтя, что количество городов по всем входным данным не 
 //* превосходит 100, можем сразу установить пределы матрицы
@@ -200,12 +278,27 @@ for(ll i=1;i<=count_of_cities;i++){
         pheromone[j][i]=start_pheromone_concentration;
     }
 }
+
+if (dev_det){
+    cout << "COMPLETED" << '\n';
+    cout << "Creating containers for answer "
+}
+
+
+
 //todo Создание отдельных контейнеров для хранения наилучшего найденного
 //todo пути
 //? Зачем?
 //* Так удобнее сохранять результаты.
 vector<ll> best_way(0);
 long double best_length=0;
+
+if(dev_det){
+    cout << "COMPLETED" << '\n';
+    cout << "Initialization containers for best way ";
+}
+
+
 
 //todo Задание стартового маршрута, для сравнения
 //? Каким он является?
@@ -215,6 +308,11 @@ for(int i=1;i<=count_of_cities;i++){
     best_length+=Distance[i][best_way.back()];
 }
 
+if(dev_det){
+    cout << "COMPLETED" << '\n';
+}
+
+
 
 //todo Получение времени жизни колонии
 cout << '\n'; // Новая строчка
@@ -223,7 +321,9 @@ ll colony_time_limit; // Сама переменная для хранения �
 cin >> colony_time_limit; // Принятие этой самой переменной
 
 
-
+if(dev_det){
+    cout << "Calculating answer ";
+}
 
 long long count_of_ants=count_of_cities;
 // todo Цикл по времени жизни колонии 
@@ -237,37 +337,49 @@ for(ll current_time=1;current_time<=colony_time_limit;current_time++){
       //$ Для начала подсчитаем вероятность перехода в каждый город
       //? То есть?
       //* Подсчитаем значение числителей из поставленной формулы и запишем их в массив(вектор)
-      vector<long double> probabilities(count_of_cities+1,0);
-      // $ Параллельно подсчитаем сумму всех числителей
-      //? Как?
-      //* Просто создадим соответствующую переменную, куда каждый раз будем прибавлять полученное число.
-      long double sum_of_probabilities=0;
+      vector<long long> probabilities(count_of_cities+1,0);
+     
+      //@ Предподсчитаем сумму всех числителей, записывая их в вектор probabilities и дополнительно 
+      //@ домножая на 10^4, чтобы те были целыми числами. Это необходимо для алгоритма вероятностного выбора 
+      //@ города для перехода.
+      //? Что я для этого предприму?
+      //* Создам саму переменную
+      ll sum_of_probabilities=0;
+      //* Далее буду увеличивать её по мере прохождения цикла
       for(long long cur_city=1;cur_city<=count_of_cities;cur_city++){
-         probabilities[cur_city]=pow(pheromone[Roy[cur_ant_number].last_visited_city][cur_city],ALPHA)*pow(back_Distance[Roy[cur_ant_number].last_visited_city][cur_city],BETA);
+         probabilities[cur_city]=(ll)(pow(pheromone[Roy[cur_ant_number].last_visited_city][cur_city],ALPHA)*pow(matrix_of_seen[Roy[cur_ant_number].last_visited_city][cur_city],BETTA));
          sum_of_probabilities+=probabilities[cur_city];
         } 
-
-      //w Теперь будем подсчитывать вероятности в тот-же вектор. Значение знаменателя сохранено.
-      ll sum_of_probabilities_ll=0;
-      for(ll cur_city=1;cur_city<=count_of_cities;cur_city++){
-          while(Roy[cur_ant_number].was_in_city(cur_city) && cur_city<=count_of_cities) cur_city+=1;
-          probabilities[cur_city]=(ll)(probabilities[cur_city]/sum_of_probabilities)*1e6;
-          sum_of_probabilities_ll+=(ll)probabilities[cur_city];
-      }  
       
-      //w Теперь мы должны реализовать рулетку выбора
-      //@ Создадим префиксный массив для массива probabiities;
-      vector<ll> prefix(count_of_cities,0);
-      prefix[0]=probabilities[1];
-      for(ll i=2;i<=count_of_cities;i++){
-          prefix[i]=prefix[i-1]+probabilities[i];
-      }
+      
       
       //w Запускаем рандомайзер, путём выбора случайного числа из предложенного предела 
        
        // Здесь будет код, который будет выбирать город из диапазона
        // пусть он будет называться selected_city
        ll selected_city;
+      
+      //? Каким образом будет работать алгоритм?
+      //* Воспользуемся простой конструкцией, основанной на описанной в текстовой части работы.
+      //* Предподсчитав сумму всех числителей, выбираем какое-нибудь число из заданного диапазона.
+      ll rand_ver=getrandom(0,sum_of_probabilities);
+      //* Далее по циклу будем вычитать из числа rand_ver желание перехода муравья в каждый из городов, пока 
+      //* значение rand_ver не станет меньше нуля. Когда это случится, город, желание в который было вычтено,
+      //* будет считаться городом для перехода.
+
+      for(int cur_city=1;cur_city<=count_of_cities;cur_city++){
+          rand_ver-=probabilities[cur_city];
+          if(rand_ver<0){
+              selected_city=cur_city;
+              cur_city=count_of_cities+1;
+          }
+        }
+
+
+
+
+
+
 
       //ч Выбранный муравей отправляется в выбранный город
       Roy[cur_ant_number].Go_to_city(selected_city);
@@ -322,6 +434,21 @@ for(ll current_time=1;current_time<=colony_time_limit;current_time++){
 
 
 }
+
+if(dev_det){
+    cout << "COMPLETED" << '\n';
+}
+
+cout << "Answer calculated!" << '\n';
+cout << "The way is: " << '\n';
+
+//w Вывод найденного маршрута
+for(auto i : best_way){
+    cout << i << ", ";
+}
+cout << '\n';
+
+cout << "The best way has length " << best_length << '\n';
 
 
 
