@@ -4,6 +4,7 @@
         "вектор"
     ],
     "files.associations": {
-        "iostream": "cpp"
+        "iostream": "cpp",
+        "vector": "cpp"
     }
 }

@@ -4,7 +4,7 @@
 
 //@ подключение начальных библиотек
 #include <iostream>
-#include <cmath>
+#include <math.h>
 #include <vector>
 #include <set>
 #include <ctime>
@@ -33,7 +33,7 @@ typedef long long ll;
 
 //! Создание важной констатны, хранящей в себе максимально-возможное
 //! количество городов
-const int MAX_CITY_COUNT=100;
+const int MAX_CITY_COUNT=150;
 
 
 
@@ -47,10 +47,7 @@ const int MAX_CITY_COUNT=100;
  // @ Структура "точка" задаваемая как точка на плоскости Oxy
  struct point{
  ll x_coordinate,y_coordinate;
- point(ll x,ll y){ // просто конструктор для этой структуры
- x_coordinate=x;
- y_coordinate=y;
- }
+
  };
 
 
@@ -62,15 +59,15 @@ const int MAX_CITY_COUNT=100;
  //@ Структура "Муравей"
  struct Ant{
   // вектор, который будет хранить номера посещённых городов
- vector<long long> list_of_visited_cities;
- set<long long> set_of_visited_cities;
- long long route_length; // длина пути, который уже пройден муравьём
+ vector<int> list_of_visited_cities;
+ set<int> set_of_visited_cities;
+ long double route_length; // длина пути, который уже пройден муравьём
 
-long long last_visited_city;
+ int last_visited_city;
 
 
  // todo задание стартового города муравью
- void set_start_city(long long start_city){
+ void set_start_city(int start_city){
  clear();
  last_visited_city=start_city;
  // добавление города в список
@@ -100,7 +97,7 @@ long long last_visited_city;
  };
 
 //todo метод, проверяющий, был ли муравей в определённом городе
- bool was_in_city(long long city_number){
+ bool was_in_city(int city_number){
      if(set_of_visited_cities.count(city_number)==0) return false;
      return true;
  }
@@ -132,7 +129,7 @@ return sqrt(d1_square+d2_square);
 srand(time(0));
 
 
-cout << "Do you want to see developer details? (Y/N)" << '\n';
+cout << "Do you want to see the details for the developer? (Y/N)" << '\n';
 bool dev_det;
 char ask;
 cin >> ask;
@@ -176,7 +173,7 @@ cout  << '\n';
 //! Особенно важная переменная
 //? За что она отвечает?
 //* За изначальную концентрацию феромона на поле/графе
-long double start_pheromone_concentration;
+float start_pheromone_concentration;
 cout << "start_pheromone_concentration = ";
 cin >> start_pheromone_concentration;
 cout << '\n';
@@ -187,7 +184,7 @@ int count_of_cities;
 cout << "Enter count of cities: ";
 cin >> count_of_cities; // получаем число городов
 cout << '\n'; // переходим на новую строку
-vector<point> cities(count_of_cities);
+vector<point> cities(count_of_cities+1);
 // Создаем вектор из городов
 
 
@@ -209,8 +206,8 @@ if(dev_det){
 // todo инициализация матрицы расстояний
 // ? Каким образом?
 // * Обнуление всех ячеек.
-for(long long i=1;i<=count_of_cities;i++){
-    for(long long j =1;j<=count_of_cities;j++) Distance[i][j]=0;
+for(int i=1;i<=count_of_cities;i++){
+    for(int j =1;j<=count_of_cities;j++) Distance[i][j]=0;
 }
 
 
@@ -227,7 +224,7 @@ for(int i=1;i<=count_of_cities;i++){
         long double temp=distance_between_points(cities[i],cities[j]);
         Distance[i][j]=temp;
         Distance[j][i]=temp;
-
+        
 
     }
 }
@@ -239,6 +236,16 @@ for(int i=1;i<=count_of_cities;i++){
 
 if(dev_det){
     cout << "COMPLETED" << '\n';
+
+    cout << "Distance =" << '\n';
+    for(int i=1;i<=count_of_cities;i++){
+        for(int j=1;j<=count_of_cities;j++) cout << Distance[i][j] << " ";
+        cout << '\n';
+    }
+
+
+
+
     cout << "Initializing matrix_of_seen ";
 }
 //w Заполнение матрицы обратных расстояний
@@ -262,7 +269,7 @@ if(dev_det){
 vector<Ant> Roy(count_of_cities+1);
 
 //todo Установка начальных положений муравьёв
-for(ll i=1;i<=count_of_cities;i++){
+for(int i=1;i<=count_of_cities;i++){
     Roy[i].set_start_city(i); // Сообщаем i-тому муравью его начальный
     // город
 }
@@ -280,8 +287,8 @@ if (dev_det){
 //* превосходит 100, можем сразу установить пределы матрицы
 long double pheromone[MAX_CITY_COUNT+1][MAX_CITY_COUNT+1];
 
-for(ll i=1;i<=count_of_cities;i++){
-    for(ll j=1;j<i;j++){
+for(int i=1;i<=count_of_cities;i++){
+    for(int j=1;j<i;j++){
         pheromone[i][j]=start_pheromone_concentration;
         pheromone[j][i]=start_pheromone_concentration;
     }
@@ -298,7 +305,7 @@ if (dev_det){
 //todo пути
 //? Зачем?
 //* Так удобнее сохранять результаты.
-vector<ll> best_way(0);
+vector<int> best_way(0);
 long double best_length=0;
 
 if(dev_det){
@@ -311,10 +318,16 @@ if(dev_det){
 //todo Задание стартового маршрута, для сравнения
 //? Каким он является?
 //* Маршрут через все города по очереди в порядке возрастания
+best_way.clear();
 for(int i=1;i<=count_of_cities;i++){
     best_way.push_back(i);
-    best_length+=Distance[i][best_way.back()];
 }
+
+for(int i=1;i<count_of_cities;i++){
+    best_length+=Distance[i][i+1];
+}
+
+
 
 if(dev_det){
     cout << "COMPLETED" << '\n';
@@ -325,7 +338,7 @@ if(dev_det){
 //todo Получение времени жизни колонии
 cout << '\n'; // Новая строчка
 cout << "Enter colony lifetime (iterations): ";
-ll colony_time_limit; // Сама переменная для хранения этого предела
+int colony_time_limit; // Сама переменная для хранения этого предела
 cin >> colony_time_limit; // Принятие этой самой переменной
 
 
@@ -333,30 +346,42 @@ if(dev_det){
     cout << "Calculating answer ";
 }
 
-long long count_of_ants=count_of_cities;
+int count_of_ants=count_of_cities;
 // todo Цикл по времени жизни колонии
-for(ll current_time=1;current_time<=colony_time_limit;current_time++){
+for(int current_time=1;current_time<=colony_time_limit;current_time++){
     //todo Цикл по всем муравьям
-    for(ll cur_ant_number=1;cur_ant_number<=count_of_ants;cur_ant_number++){
+    for(int cur_ant_number=1;cur_ant_number<=count_of_ants;cur_ant_number++){
       // todo Построить маршрут по описанному правилу
+      for(int cur_number_of_visited_cities=1;cur_number_of_visited_cities<count_of_cities;cur_number_of_visited_cities++){
       //? Как это сделать?
       //* Будем использовать уже известную формулу, основанную на вероятностном выборе
 
       //$ Для начала подсчитаем вероятность перехода в каждый город
       //? То есть?
       //* Подсчитаем значение числителей из поставленной формулы и запишем их в массив(вектор)
-      vector<long long> probabilities(count_of_cities+1,0);
+      vector<long double> wishes(count_of_cities+1,0);
 
-      //@ Предподсчитаем сумму всех числителей, записывая их в вектор probabilities и дополнительно
+      //@ Предподсчитаем сумму всех числителей, записывая их в вектор wishes и дополнительно
       //@ домножив на 10^4, чтобы те были целыми числами. Это необходимо для алгоритма вероятностного выбора
       //@ города для перехода.
       //? Что я для этого предприму?
       //* Создам саму переменную
       ll sum_of_probabilities=0;
       //* Далее буду увеличивать её по мере прохождения цикла
+
+      if(dev_det){
+          cout << "Calculating wishes ";
+      }
+
       for(long long cur_city=1;cur_city<=count_of_cities;cur_city++){
-         probabilities[cur_city]=(ll)(pow(pheromone[Roy[cur_ant_number].last_visited_city][cur_city],ALPHA)*pow(matrix_of_seen[Roy[cur_ant_number].last_visited_city][cur_city],BETTA));
-         sum_of_probabilities+=probabilities[cur_city];
+         if(Roy[cur_ant_number].was_in_city(cur_city)==false){
+             wishes[cur_city]=(ll)(pow(pheromone[Roy[cur_ant_number].last_visited_city][cur_city],ALPHA)*pow(matrix_of_seen[Roy[cur_ant_number].last_visited_city][cur_city],BETTA)*10000);
+         }
+         sum_of_probabilities+=wishes[cur_city];
+        }
+        if(dev_det){
+            cout << "COMPLETED" << '\n';
+            cout << "Choosing city ";
         }
 
 
@@ -365,33 +390,34 @@ for(ll current_time=1;current_time<=colony_time_limit;current_time++){
 
        // Здесь будет код, который будет выбирать город из диапазона
        // пусть он будет называться selected_city
-       ll selected_city;
+       int selected_city;
 
       //? Каким образом будет работать алгоритм?
       //* Воспользуемся простой конструкцией, основанной на описанной в текстовой части работы.
       //* Предподсчитав сумму всех числителей, выбираем какое-нибудь число из заданного диапазона.
-      ll rand_ver=getrandom(1,sum_of_probabilities);
-      //* Далее по циклу будем вычитать из числа rand_ver желание перехода муравья в каждый из городов, пока
-      //* значение rand_ver не станет меньше нуля. Когда это случится, город, желание в который было вычтено,
+      ll rand_val=getrandom(1,sum_of_probabilities);
+      //* Далее по циклу будем вычитать из числа rand_val желание перехода муравья в каждый из городов, пока
+      //* значение rand_val не станет меньше нуля. Когда это случится, город, желание в который было вычтено,
       //* будет считаться городом для перехода.
 
       for(int cur_city=1;cur_city<=count_of_cities;cur_city++){
-          rand_ver-=probabilities[cur_city];
-          if(rand_ver<0){
+          rand_val-=(ll)wishes[cur_city];
+          if(rand_val<0){
               selected_city=cur_city;
               cur_city=count_of_cities+1;
           }
         }
 
+      
 
-
-
+        
 
 
 
       //ч Выбранный муравей отправляется в выбранный город
       Roy[cur_ant_number].Go_to_city(selected_city);
       //* Остальные предподсчёты сделает использованный метод структуры
+      }
     }
 
     //~ КОНЕЦ ЦИКЛА ПО МУРАВЬЯМ
@@ -401,6 +427,11 @@ for(ll current_time=1;current_time<=colony_time_limit;current_time++){
     //@ Выбираем муравья с наименьшим путем, и сравниваем его путь с найденным ранее.
     //* На самом деле, мы будем "сравнивать" каждого муравья с наилучшим маршрутом таким образом не упустим
     //* наилучший вариант, если таковой имеется.
+    
+    if(dev_det){
+        cout << "Updating best way ";
+    }
+
 
     for(int cur_ant_number=1;cur_ant_number<=count_of_ants;cur_ant_number++){
         if(best_length>Roy[cur_ant_number].route_length){ // если маршрут муравья cur_ant_number лучше раннее
@@ -413,25 +444,43 @@ for(ll current_time=1;current_time<=colony_time_limit;current_time++){
         }
     }
 
+
+    if(dev_det){
+        cout << "COMPLETED" << '\n';
+        cout << "Updating pheromon" << '\n';
+        cout << "All" << '\n';
+    }
+
+
     //todo Обновление феромона
     //ч В начале испарим весь феромон по всему полю
     for(int cur_city=1;cur_city<=count_of_cities;cur_city++){
         for(int next_city=1;next_city<cur_city;next_city++){
-            pheromone[cur_city][next_city]=(1-p)*pheromone[cur_city][next_city];
+            pheromone[cur_city][next_city]*=(1-p);
             pheromone[next_city][cur_city]=pheromone[cur_city][next_city];
         }
     }
+    if(dev_det){
+        cout << "COMPLETED" << '\n';
+        cout << "marsruts ";
+    }
 
+
+
+
+    
     //ч Теперь будем идти по порядку по всем маршрутам, заканчивая обновление феромона
-    for(int ant_number=1;ant_number<=count_of_cities;ant_number++){
-        Ant cur_Ant = Roy[ant_number];
-
-        for(int cur_city_way_index=1;cur_city_way_index<count_of_cities;cur_city_way_index++){
-            int start_city=cur_Ant.list_of_visited_cities[cur_city_way_index];
-            int next_city=cur_Ant.list_of_visited_cities[cur_city_way_index+1];
-            pheromone[start_city][next_city]=Q/Distance[start_city][next_city];
-            pheromone[next_city][start_city]=pheromone[start_city][next_city];
+    for(int ant_number=1;ant_number<=count_of_ants;ant_number++){
+        int prev_city_number=0;
+        for(auto cur_city_number : Roy[ant_number].list_of_visited_cities){
+            pheromone[cur_city_number][prev_city_number]+=Q/Roy[ant_number].route_length;
+            pheromone[prev_city_number][cur_city_number]=pheromone[cur_city_number][prev_city_number];
+            prev_city_number=cur_city_number;
         }
+    }
+
+    if(dev_det){
+        cout << "COMPLETED" << '\n';
     }
 
 
