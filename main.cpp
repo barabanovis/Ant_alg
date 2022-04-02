@@ -154,10 +154,6 @@ cout << "BETTA = ";
 cin >> BETTA;
 cout << '\n';
 
-int e;
-cout << "e = ";
-cin >> e;
-cout << '\n';
 
 int Q=1;
 cout << "Q = ";
