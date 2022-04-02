@@ -14,14 +14,12 @@ using namespace std;
 
 //w Герератор псевдослучайных чисел
 //? Как он работает?
-//* Он использует время в секундах с момента запуска компьютера как зерно (seed), затем производит 
+//* Он использует время в секундах с момента запуска компьютера как зерно (seed), затем производит
 //* псевдослучайное число в пределах от заданного l до r невключительно
 int getrandom(int l,int r){
-unsigned value=unsigned(time(nullptr)); // Зерно
-for(int i=0;i<13;i++){
-    value=(value*2+343)%(r-l);
-}
-return value+l;
+unsigned ran=(8<<rand())+rand();
+ran=(ran*(r-l+3)+(r-l+234))%(r-l);
+return ran+l;
 }
 
 
@@ -44,7 +42,7 @@ const int MAX_CITY_COUNT=100;
 // * Заметим, что расстояние размеры матрицы указаты как MAX_CITY_COUNT+1 на MAX_CITY_COUNT+1
 // * потому, что количество городов, которые будет принимать программа
 // $ не превышает MAX_CITY_COUNT для лучшей показательности
- long double Distance[MAX_CITY_COUNT+1][MAX_CITY_COUNT+1]; 
+ long double Distance[MAX_CITY_COUNT+1][MAX_CITY_COUNT+1];
 
  // @ Структура "точка" задаваемая как точка на плоскости Oxy
  struct point{
@@ -82,11 +80,11 @@ long long last_visited_city;
 
 
  // todo перемещение муравья в определённый город
- void Go_to_city(long long city_number){ 
+ void Go_to_city(long long city_number){
      // @ Обновление пройденного пути
      route_length+=Distance[last_visited_city][city_number];
      // @ Добавление города в список пройденных городов
-     list_of_visited_cities.push_back(city_number); 
+     list_of_visited_cities.push_back(city_number);
      last_visited_city=city_number;
      set_of_visited_cities.insert(city_number);
 
@@ -95,7 +93,7 @@ long long last_visited_city;
 
  // todo Очистка полей муравья
  void clear(){
-    last_visited_city=0; 
+    last_visited_city=0;
     route_length=0;
     list_of_visited_cities.clear();
     set_of_visited_cities.clear();
@@ -115,9 +113,9 @@ long long last_visited_city;
 
 //w Функция для расчёта расстояния между точками
 long double distance_between_points(point A, point B){
-// ? Как получается результат? 
+// ? Как получается результат?
 // * На основе теоремы Пифагора считается расстояние между точками
-long long d1_square=(A.x_coordinate-B.x_coordinate)*(A.x_coordinate-B.x_coordinate);// ���������� ������� ���������� ������������ Oy
+long long d1_square=(A.x_coordinate-B.x_coordinate)*(A.x_coordinate-B.x_coordinate);
 long long d2_square=(A.y_coordinate-B.y_coordinate)*(A.y_coordinate-B.y_coordinate);
 
 return sqrt(d1_square+d2_square);
@@ -129,6 +127,10 @@ return sqrt(d1_square+d2_square);
 // ~ ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
  int main(){
+//* Для работы генератора случайных чисел
+//$ getrandom
+srand(time(0));
+
 
 cout << "Do you want to see developer details? (Y/N)" << '\n';
 bool dev_det;
@@ -165,6 +167,12 @@ cout << "Q = ";
 cin >> Q;
 cout << '\n';
 
+long double p;
+cout << "p = ";
+cin >> p;
+cout  << '\n';
+
+
 //! Особенно важная переменная
 //? За что она отвечает?
 //* За изначальную концентрацию феромона на поле/графе
@@ -178,7 +186,7 @@ cout << '\n';
 int count_of_cities;
 cout << "Enter count of cities: ";
 cin >> count_of_cities; // получаем число городов
-cout << '\n'; // переходим на новую строку 
+cout << '\n'; // переходим на новую строку
 vector<point> cities(count_of_cities);
 // Создаем вектор из городов
 
@@ -199,7 +207,7 @@ if(dev_det){
 
 
 // todo инициализация матрицы расстояний
-// ? Каким образом? 
+// ? Каким образом?
 // * Обнуление всех ячеек.
 for(long long i=1;i<=count_of_cities;i++){
     for(long long j =1;j<=count_of_cities;j++) Distance[i][j]=0;
@@ -215,12 +223,12 @@ if(dev_det){
 // * Учитывая, что Distance[i][j]=Distance[j][i] можно значительно ускорить вычисления
 for(int i=1;i<=count_of_cities;i++){
     for(int j=1;j<i;j++){
-            
-        ll temp=distance_between_points(cities[i],cities[j]);
+
+        long double temp=distance_between_points(cities[i],cities[j]);
         Distance[i][j]=temp;
         Distance[j][i]=temp;
 
-    
+
     }
 }
 
@@ -268,7 +276,7 @@ if (dev_det){
 
 
 
-//* Учтя, что количество городов по всем входным данным не 
+//* Учтя, что количество городов по всем входным данным не
 //* превосходит 100, можем сразу установить пределы матрицы
 long double pheromone[MAX_CITY_COUNT+1][MAX_CITY_COUNT+1];
 
@@ -281,7 +289,7 @@ for(ll i=1;i<=count_of_cities;i++){
 
 if (dev_det){
     cout << "COMPLETED" << '\n';
-    cout << "Creating containers for answer "
+    cout << "Creating containers for answer ";
 }
 
 
@@ -326,21 +334,21 @@ if(dev_det){
 }
 
 long long count_of_ants=count_of_cities;
-// todo Цикл по времени жизни колонии 
+// todo Цикл по времени жизни колонии
 for(ll current_time=1;current_time<=colony_time_limit;current_time++){
-    //todo Цикл по всем муравьям 
+    //todo Цикл по всем муравьям
     for(ll cur_ant_number=1;cur_ant_number<=count_of_ants;cur_ant_number++){
-      // todo Построить маршрут по описанному правилу 
+      // todo Построить маршрут по описанному правилу
       //? Как это сделать?
       //* Будем использовать уже известную формулу, основанную на вероятностном выборе
-     
+
       //$ Для начала подсчитаем вероятность перехода в каждый город
       //? То есть?
       //* Подсчитаем значение числителей из поставленной формулы и запишем их в массив(вектор)
       vector<long long> probabilities(count_of_cities+1,0);
-     
-      //@ Предподсчитаем сумму всех числителей, записывая их в вектор probabilities и дополнительно 
-      //@ домножая на 10^4, чтобы те были целыми числами. Это необходимо для алгоритма вероятностного выбора 
+
+      //@ Предподсчитаем сумму всех числителей, записывая их в вектор probabilities и дополнительно
+      //@ домножив на 10^4, чтобы те были целыми числами. Это необходимо для алгоритма вероятностного выбора
       //@ города для перехода.
       //? Что я для этого предприму?
       //* Создам саму переменную
@@ -349,21 +357,21 @@ for(ll current_time=1;current_time<=colony_time_limit;current_time++){
       for(long long cur_city=1;cur_city<=count_of_cities;cur_city++){
          probabilities[cur_city]=(ll)(pow(pheromone[Roy[cur_ant_number].last_visited_city][cur_city],ALPHA)*pow(matrix_of_seen[Roy[cur_ant_number].last_visited_city][cur_city],BETTA));
          sum_of_probabilities+=probabilities[cur_city];
-        } 
-      
-      
-      
-      //w Запускаем рандомайзер, путём выбора случайного числа из предложенного предела 
-       
+        }
+
+
+
+      //w Запускаем рандомайзер, путём выбора случайного числа из предложенного предела
+
        // Здесь будет код, который будет выбирать город из диапазона
        // пусть он будет называться selected_city
        ll selected_city;
-      
+
       //? Каким образом будет работать алгоритм?
       //* Воспользуемся простой конструкцией, основанной на описанной в текстовой части работы.
       //* Предподсчитав сумму всех числителей, выбираем какое-нибудь число из заданного диапазона.
-      ll rand_ver=getrandom(0,sum_of_probabilities);
-      //* Далее по циклу будем вычитать из числа rand_ver желание перехода муравья в каждый из городов, пока 
+      ll rand_ver=getrandom(1,sum_of_probabilities);
+      //* Далее по циклу будем вычитать из числа rand_ver желание перехода муравья в каждый из городов, пока
       //* значение rand_ver не станет меньше нуля. Когда это случится, город, желание в который было вычтено,
       //* будет считаться городом для перехода.
 
@@ -387,11 +395,11 @@ for(ll current_time=1;current_time<=colony_time_limit;current_time++){
     }
 
     //~ КОНЕЦ ЦИКЛА ПО МУРАВЬЯМ
-    
+
     // todo Выбираем лучший маршрут
     //w Делается это очень просто:
     //@ Выбираем муравья с наименьшим путем, и сравниваем его путь с найденным ранее.
-    //* На самомо деле, мы будем "сравнивать" каждого муравья с наилучшим маршрутом таким образом не упустим 
+    //* На самом деле, мы будем "сравнивать" каждого муравья с наилучшим маршрутом таким образом не упустим
     //* наилучший вариант, если таковой имеется.
 
     for(int cur_ant_number=1;cur_ant_number<=count_of_ants;cur_ant_number++){
@@ -404,33 +412,27 @@ for(ll current_time=1;current_time<=colony_time_limit;current_time++){
              // обновление самого маршрута
         }
     }
-    
+
     //todo Обновление феромона
-    //ч Будем поочерёдно обследовать маршруты каждого муравья и изменять значения феромона
-    for(ll cur_ant_number=1;cur_ant_number<=count_of_ants;cur_ant_number++){
-        Ant cur_ant=Roy[cur_ant_number]; // Подобное объявнение допустимо, так как мы не будем изменять 
-        // характеристики муравья
-        
-        //todo Обновление феромона для маршрута выбранного муравья
-        for(ll current_city_index=1;current_city_index<(ll)cur_ant.list_of_visited_cities.size();current_city_index++){
-           ll current_city=cur_ant.list_of_visited_cities[current_city_index];
-           ll next_city=cur_ant.list_of_visited_cities[current_city_index+1];
-           long double delta_pheromone=0; // Переменная, которая будет хранить в себе изменение значения феромона.
-           
-
-           delta_pheromone=Q/(cur_ant.route_length);
-
-           // Обновление значения феромона по формуле
-           //! Завершить формулу!!!
-           pheromone[current_city][next_city]=(1-p)*pheromone[current_city][next_city]; 
-
-
-        }    
-
-
+    //ч В начале испарим весь феромон по всему полю
+    for(int cur_city=1;cur_city<=count_of_cities;cur_city++){
+        for(int next_city=1;next_city<cur_city;next_city++){
+            pheromone[cur_city][next_city]=(1-p)*pheromone[cur_city][next_city];
+            pheromone[next_city][cur_city]=pheromone[cur_city][next_city];
+        }
     }
 
+    //ч Теперь будем идти по порядку по всем маршрутам, заканчивая обновление феромона
+    for(int ant_number=1;ant_number<=count_of_cities;ant_number++){
+        Ant cur_Ant = Roy[ant_number];
 
+        for(int cur_city_way_index=1;cur_city_way_index<count_of_cities;cur_city_way_index++){
+            int start_city=cur_Ant.list_of_visited_cities[cur_city_way_index];
+            int next_city=cur_Ant.list_of_visited_cities[cur_city_way_index+1];
+            pheromone[start_city][next_city]=Q/Distance[start_city][next_city];
+            pheromone[next_city][start_city]=pheromone[start_city][next_city];
+        }
+    }
 
 
 }
