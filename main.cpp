@@ -46,7 +46,7 @@ const int MAX_CITY_COUNT=150;
 
  // @ Структура "точка" задаваемая как точка на плоскости Oxy
  struct point{
- ll x_coordinate,y_coordinate;
+ int x_coordinate,y_coordinate;
 
  };
 
