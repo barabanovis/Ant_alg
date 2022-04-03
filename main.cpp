@@ -145,17 +145,17 @@ if(ask=='Y' || ask=='y'){
 cout << "Enter constants " << '\n';
 
 cout << "ALPHA = ";
-int ALPHA;
+float ALPHA;
 cin >> ALPHA;
 cout << '\n';
 
-int BETTA;
+float BETTA;
 cout << "BETTA = ";
 cin >> BETTA;
 cout << '\n';
 
 
-int Q=1;
+float Q=1;
 cout << "Q = ";
 cin >> Q;
 cout << '\n';
@@ -336,7 +336,7 @@ cout << '\n'; // Новая строчка
 cout << "Enter colony lifetime (iterations): ";
 int colony_time_limit; // Сама переменная для хранения этого предела
 cin >> colony_time_limit; // Принятие этой самой переменной
-
+cout << "____________________________________________" << '\n';
 
 if(dev_det){
     cout << "Calculating answer ";
